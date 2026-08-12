@@ -1,29 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
+<label>목표 시간:</label>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> clock </title>
-    <style>
-        h4 {
-            font-weight: normal;
-        }
-    </style>
-</head>
+<input
+    id="target-hour"
+    type="number"
+    min="0"
+    max="23"
+    placeholder="시"
+    style="width: 45px;"
+>
 
-<body>
-    <script src="src.js"></script>
+<span>:</span>
 
-    <label for="target-time">목표 시간:</label>
-    <input id="target-hour" style="width: 20px;">
-    <label for="target-time">:</label>
-    <input id="target-minute" style="width: 20px;">
+<input
+    id="target-minute"
+    type="number"
+    min="0"
+    max="59"
+    placeholder="분"
+    style="width: 45px;"
+>
 
+<h4 id="current-time">현재 시간: --:--:--</h4>
+<h4 id="remaining-time">남은 시간: --시간 --분 --초</h4>
 
-    <h4 id="current-time">현재 시간: --:--:--</h4>
-    <h4 id="remaining-time">남은 시간: --:--:--</h4>
-</body>
-
-
-</html>
+<script src="src.js"></script>
