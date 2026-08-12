@@ -1,26 +1,64 @@
-<label>목표 시간:</label>
+<!DOCTYPE html>
+<html lang="ko">
 
-<input
-    id="target-hour"
-    type="number"
-    min="0"
-    max="23"
-    placeholder="시"
-    style="width: 45px;"
->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
 
-<span>:</span>
+    <style>
+        h4 {
+            font-weight: normal;
+        }
 
-<input
-    id="target-minute"
-    type="number"
-    min="0"
-    max="59"
-    placeholder="분"
-    style="width: 45px;"
->
+        input {
+            width: 40px;
+        }
+    </style>
+</head>
 
-<h4 id="current-time">현재 시간: --:--:--</h4>
-<h4 id="remaining-time">남은 시간: --시간 --분 --초</h4>
+<body>
 
-<script src="src.js"></script>
+    <label>목표 시간:</label>
+
+    <input
+        id="target-hour"
+        type="number"
+        min="0"
+        max="23"
+        placeholder="시"
+    >
+
+    <span>:</span>
+
+    <input
+        id="target-minute"
+        type="number"
+        min="0"
+        max="59"
+        placeholder="분"
+    >
+
+
+    <h4 id="current-time">
+        현재 시간: --:--:--
+    </h4>
+
+    <h4 id="remaining-time">
+        남은 시간: --시간 --분 --초
+    </h4>
+
+    <h4 id="remaining-minutes">
+        남은 분 : --
+    </h4>
+
+    <h4 id="remaining-seconds">
+        남은 초 : --
+    </h4>
+
+
+    <script src="src.js"></script>
+
+</body>
+
+</html>
