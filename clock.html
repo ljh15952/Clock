@@ -8,109 +8,905 @@
     <title>Clock</title>
 
     <style>
-        h4 {
-            font-weight: normal;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 24px;
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            color: #f8fafc;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #25324a 0%,
+                    #111827 42%,
+                    #05070d 100%
+                );
+        }
+
+        .app {
+            width: min(900px, 100%);
+
+            display: grid;
+            grid-template-columns:
+                minmax(280px, 1fr)
+                minmax(260px, 320px);
+
+            gap: 50px;
+
+            padding: 44px;
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+
+            background:
+                rgba(15, 23, 42, 0.74);
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.45);
+        }
+
+
+        /* =========================
+           왼쪽
+        ========================= */
+
+        .subtitle {
+            margin-bottom: 28px;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            letter-spacing: 0.22em;
+
+            color: #94a3b8;
+        }
+
+        .target-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 34px;
+        }
+
+        .target-label {
+            margin-right: 8px;
+
+            font-size: 14px;
+
+            color: #94a3b8;
         }
 
         input {
-            width: 40px;
+            width: 72px;
+
+            padding: 10px 8px;
+
+            border: 1px solid
+                rgba(255, 255, 255, 0.12);
+
+            border-radius: 10px;
+
+            outline: none;
+
+            text-align: center;
+
+            font-size: 18px;
+            font-weight: 600;
+
+            color: #f8fafc;
+
+            background:
+                rgba(255, 255, 255, 0.06);
+
+            transition:
+                border-color 0.2s,
+                background 0.2s;
         }
+
+        input:focus {
+            border-color: #60a5fa;
+
+            background:
+                rgba(96, 165, 250, 0.08);
+        }
+
+        .colon {
+            font-size: 20px;
+
+            color: #64748b;
+        }
+
+
+        /* =========================
+           시간 정보
+        ========================= */
+
+        .time-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .time-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 20px;
+        }
+
+        .time-label {
+            font-size: 13px;
+
+            color: #64748b;
+        }
+
+        .time-value {
+            margin: 0;
+
+            font-size: 15px;
+            font-weight: 500;
+
+            text-align: right;
+
+            color: #e2e8f0;
+        }
+
 
         /* =========================
            게이지
         ========================= */
 
-        .gauge {
-            width: 300px;
-            height: 20px;
-
-            background-color: #ddd;
-
-            border-radius: 10px;
-
-            overflow: hidden;
+        .progress-area {
+            margin-top: 36px;
         }
 
-        #gauge-bar {
-            width: 100%;
-            height: 100%;
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
 
-            background-color: #4caf50;
+            margin-bottom: 9px;
 
-            transition: width 0.5s linear;
+            font-size: 12px;
+
+            color: #64748b;
         }
 
         #gauge-text {
-            width: 300px;
+            color: #cbd5e1;
+        }
+
+        .gauge {
+            position: relative;
+
+            width: 100%;
+            height: 9px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background:
+                rgba(255, 255, 255, 0.07);
+        }
+
+        #gauge-bar {
+            width: 0%;
+            height: 100%;
+
+            border-radius: inherit;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #38bdf8,
+                    #818cf8
+                );
+
+            box-shadow:
+                0 0 15px
+                rgba(96, 165, 250, 0.5);
+
+            transition:
+                width 0.9s linear;
+        }
+
+
+        /* =========================
+           모래시계 영역
+        ========================= */
+
+        .hourglass-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hourglass-svg {
+            width: min(235px, 100%);
+            height: auto;
+
+            overflow: visible;
+
+            filter:
+                drop-shadow(
+                    0 22px 22px
+                    rgba(0, 0, 0, 0.38)
+                );
+        }
+
+
+        /* =========================
+           모래
+        ========================= */
+
+        .sand-fill {
+            transform-box: fill-box;
+            transform-origin: center bottom;
+
+            transform:
+                scaleY(
+                    var(--sand-scale, 0)
+                );
+
+            transition:
+                transform 0.9s linear;
+        }
+
+
+        /* =========================
+           떨어지는 모래
+        ========================= */
+
+        #sand-stream {
+            opacity: 0;
+
+            stroke-dasharray: 4 7;
+
+            animation:
+                sandFall 0.42s linear infinite;
+
+            transition:
+                opacity 0.25s;
+        }
+
+        .hourglass-svg.running
+        #sand-stream {
+            opacity: 1;
+        }
+
+        @keyframes sandFall {
+            from {
+                stroke-dashoffset: 0;
+            }
+
+            to {
+                stroke-dashoffset: -11;
+            }
+        }
+
+
+        /* =========================
+           모래시계 텍스트
+        ========================= */
+
+        .hourglass-info {
+            margin-top: 10px;
 
             text-align: center;
-
-            margin-top: 5px;
         }
+
+        #hourglass-percent {
+            display: block;
+
+            margin-bottom: 4px;
+
+            font-size: 28px;
+            font-weight: 600;
+
+            letter-spacing: -0.04em;
+
+            color: #f8fafc;
+        }
+
+        #hourglass-label {
+            font-size: 12px;
+
+            color: #64748b;
+        }
+
+
+        /* =========================
+           반응형
+        ========================= */
+
+        @media (max-width: 700px) {
+            .app {
+                grid-template-columns: 1fr;
+
+                gap: 40px;
+
+                padding: 30px 24px;
+            }
+
+            .hourglass-panel {
+                grid-row: 1;
+            }
+        }
+
+
+        /* =========================
+           애니메이션 감소 설정
+        ========================= */
+
+        @media (
+            prefers-reduced-motion: reduce
+        ) {
+            #sand-stream {
+                animation: none;
+            }
+
+            .sand-fill,
+            #gauge-bar {
+                transition: none;
+            }
+        }
+
     </style>
 </head>
 
 
 <body>
 
-    <label>목표 시간:</label>
+<div class="app">
 
-    <input
-        id="target-hour"
-        type="number"
-        min="0"
-        max="23"
-        placeholder="시"
-    >
+    <!-- =========================
+         시간 정보
+    ========================= -->
 
-    <span>:</span>
+    <section>
 
-    <input
-        id="target-minute"
-        type="number"
-        min="0"
-        max="59"
-        placeholder="분"
-    >
+        <div class="subtitle">
+            TIME UNTIL
+        </div>
 
 
-    <h4 id="current-time">
-        현재 시간: --:--:--
-    </h4>
+        <div class="target-row">
+
+            <span class="target-label">
+                목표 시간
+            </span>
+
+            <input
+                id="target-hour"
+                type="number"
+                min="0"
+                max="23"
+                placeholder="시"
+            >
+
+            <span class="colon">
+                :
+            </span>
+
+            <input
+                id="target-minute"
+                type="number"
+                min="0"
+                max="59"
+                placeholder="분"
+            >
+
+        </div>
 
 
-    <h4 id="remaining-time">
-        남은 시간: --시간 --분 --초
-    </h4>
+        <div class="time-list">
+
+            <div class="time-item">
+
+                <span class="time-label">
+                    현재 시간
+                </span>
+
+                <h4
+                    id="current-time"
+                    class="time-value"
+                >
+                    --:--:--
+                </h4>
+
+            </div>
 
 
-    <h4 id="remaining-minutes">
-        남은 분 : --
-    </h4>
+            <div class="time-item">
+
+                <span class="time-label">
+                    남은 시간
+                </span>
+
+                <h4
+                    id="remaining-time"
+                    class="time-value"
+                >
+                    --시간 --분 --초
+                </h4>
+
+            </div>
 
 
-    <h4 id="remaining-seconds">
-        남은 초 : --
-    </h4>
+            <div class="time-item">
+
+                <span class="time-label">
+                    남은 분
+                </span>
+
+                <h4
+                    id="remaining-minutes"
+                    class="time-value"
+                >
+                    --
+                </h4>
+
+            </div>
+
+
+            <div class="time-item">
+
+                <span class="time-label">
+                    남은 초
+                </span>
+
+                <h4
+                    id="remaining-seconds"
+                    class="time-value"
+                >
+                    --
+                </h4>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             게이지
+        ========================= -->
+
+        <div class="progress-area">
+
+            <div class="progress-header">
+
+                <span>
+                    REMAINING
+                </span>
+
+                <span id="gauge-text">
+                    --%
+                </span>
+
+            </div>
+
+            <div class="gauge">
+
+                <div id="gauge-bar"></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
 
 
     <!-- =========================
-         게이지
+         모래시계
     ========================= -->
 
-    <div class="gauge">
+    <section class="hourglass-panel">
 
-        <div id="gauge-bar"></div>
+        <svg
+            id="hourglass-svg"
+            class="hourglass-svg"
+            viewBox="0 0 240 340"
+            role="img"
+            aria-label="남은 시간을 표시하는 모래시계"
+        >
 
-    </div>
+            <defs>
 
-    <div id="gauge-text">
-        --%
-    </div>
+                <!-- 금속 프레임 -->
+                <linearGradient
+                    id="metal"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                >
+                    <stop
+                        offset="0%"
+                        stop-color="#f8fafc"
+                    />
+
+                    <stop
+                        offset="22%"
+                        stop-color="#94a3b8"
+                    />
+
+                    <stop
+                        offset="50%"
+                        stop-color="#334155"
+                    />
+
+                    <stop
+                        offset="78%"
+                        stop-color="#64748b"
+                    />
+
+                    <stop
+                        offset="100%"
+                        stop-color="#cbd5e1"
+                    />
+                </linearGradient>
 
 
-    <script src="src.js"></script>
+                <!-- 유리 -->
+                <linearGradient
+                    id="glass"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                >
+                    <stop
+                        offset="0%"
+                        stop-color="#ffffff"
+                        stop-opacity="0.18"
+                    />
+
+                    <stop
+                        offset="45%"
+                        stop-color="#bfdbfe"
+                        stop-opacity="0.03"
+                    />
+
+                    <stop
+                        offset="100%"
+                        stop-color="#ffffff"
+                        stop-opacity="0.11"
+                    />
+                </linearGradient>
+
+
+                <!-- 모래 -->
+                <linearGradient
+                    id="sand"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                >
+                    <stop
+                        offset="0%"
+                        stop-color="#fde68a"
+                    />
+
+                    <stop
+                        offset="55%"
+                        stop-color="#fbbf24"
+                    />
+
+                    <stop
+                        offset="100%"
+                        stop-color="#d97706"
+                    />
+                </linearGradient>
+
+
+                <!-- 상단 모래 영역 -->
+                <clipPath id="upper-clip">
+
+                    <path
+                        d="
+                        M68 67
+                        C72 111 79 141 109 162
+                        C115 166 118 172 120 178
+                        C122 172 125 166 131 162
+                        C161 141 168 111 172 67
+                        Z
+                        "
+                    />
+
+                </clipPath>
+
+
+                <!-- 하단 모래 영역 -->
+                <clipPath id="lower-clip">
+
+                    <path
+                        d="
+                        M120 178
+                        C118 185 115 190 109 194
+                        C79 215 72 245 68 289
+                        L172 289
+                        C168 245 161 215 131 194
+                        C125 190 122 185 120 178
+                        Z
+                        "
+                    />
+
+                </clipPath>
+
+            </defs>
+
+
+
+            <!-- =========================
+                 지지대
+            ========================= -->
+
+            <rect
+                x="43"
+                y="52"
+                width="12"
+                height="242"
+                rx="6"
+                fill="url(#metal)"
+                opacity="0.85"
+            />
+
+            <rect
+                x="185"
+                y="52"
+                width="12"
+                height="242"
+                rx="6"
+                fill="url(#metal)"
+                opacity="0.85"
+            />
+
+
+
+            <!-- =========================
+                 유리 내부
+            ========================= -->
+
+            <path
+                d="
+                M68 67
+                C72 111 79 141 109 162
+                C115 166 118 172 120 178
+                C122 172 125 166 131 162
+                C161 141 168 111 172 67
+                Z
+                "
+                fill="url(#glass)"
+            />
+
+            <path
+                d="
+                M120 178
+                C118 185 115 190 109 194
+                C79 215 72 245 68 289
+                L172 289
+                C168 245 161 215 131 194
+                C125 190 122 185 120 178
+                Z
+                "
+                fill="url(#glass)"
+            />
+
+
+
+            <!-- =========================
+                 위쪽 모래
+            ========================= -->
+
+            <rect
+                id="upper-sand"
+                class="sand-fill"
+                x="60"
+                y="70"
+                width="120"
+                height="108"
+                fill="url(#sand)"
+                clip-path="url(#upper-clip)"
+            />
+
+
+
+            <!-- =========================
+                 떨어지는 모래줄기
+            ========================= -->
+
+            <line
+                id="sand-stream"
+                x1="120"
+                y1="176"
+                x2="120"
+                y2="286"
+                stroke="#fbbf24"
+                stroke-width="3"
+                stroke-linecap="round"
+            />
+
+
+
+            <!-- =========================
+                 아래쪽 모래
+            ========================= -->
+
+            <rect
+                id="lower-sand"
+                class="sand-fill"
+                x="60"
+                y="178"
+                width="120"
+                height="111"
+                fill="url(#sand)"
+                clip-path="url(#lower-clip)"
+            />
+
+
+
+            <!-- =========================
+                 유리 외곽선
+            ========================= -->
+
+            <path
+                d="
+                M68 67
+                C72 111 79 141 109 162
+                C115 166 118 172 120 178
+                C122 172 125 166 131 162
+                C161 141 168 111 172 67
+                "
+                fill="none"
+                stroke="#e0f2fe"
+                stroke-opacity="0.5"
+                stroke-width="2"
+            />
+
+            <path
+                d="
+                M120 178
+                C118 185 115 190 109 194
+                C79 215 72 245 68 289
+                "
+                fill="none"
+                stroke="#e0f2fe"
+                stroke-opacity="0.5"
+                stroke-width="2"
+            />
+
+            <path
+                d="
+                M120 178
+                C122 185 125 190 131 194
+                C161 215 168 245 172 289
+                "
+                fill="none"
+                stroke="#e0f2fe"
+                stroke-opacity="0.5"
+                stroke-width="2"
+            />
+
+
+            <!-- 유리 반사 -->
+            <path
+                d="
+                M83 80
+                C85 111 91 136 107 151
+                "
+                fill="none"
+                stroke="#ffffff"
+                stroke-opacity="0.38"
+                stroke-width="4"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="
+                M82 274
+                C85 245 91 221 107 205
+                "
+                fill="none"
+                stroke="#ffffff"
+                stroke-opacity="0.22"
+                stroke-width="3"
+                stroke-linecap="round"
+            />
+
+
+
+            <!-- =========================
+                 상단 프레임
+            ========================= -->
+
+            <rect
+                x="29"
+                y="35"
+                width="182"
+                height="28"
+                rx="14"
+                fill="url(#metal)"
+            />
+
+            <rect
+                x="39"
+                y="42"
+                width="162"
+                height="4"
+                rx="2"
+                fill="#ffffff"
+                opacity="0.38"
+            />
+
+
+
+            <!-- =========================
+                 하단 프레임
+            ========================= -->
+
+            <rect
+                x="29"
+                y="287"
+                width="182"
+                height="28"
+                rx="14"
+                fill="url(#metal)"
+            />
+
+            <rect
+                x="39"
+                y="294"
+                width="162"
+                height="4"
+                rx="2"
+                fill="#ffffff"
+                opacity="0.25"
+            />
+
+        </svg>
+
+
+        <div class="hourglass-info">
+
+            <span id="hourglass-percent">
+                --%
+            </span>
+
+            <span id="hourglass-label">
+                목표 시간을 입력하세요
+            </span>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="src.js"></script>
 
 </body>
-
 </html>
